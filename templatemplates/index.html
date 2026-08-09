@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 هوش مصنوعی فرزند</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Tahoma, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            width: 100%;
+            max-width: 800px;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+        }
+        .header h1 { color: white; font-size: 24px; }
+        .header p { color: rgba(255,255,255,0.8); font-size: 14px; }
+        .header .badge { background: rgba(255,255,255,0.2); padding: 3px 12px; border-radius: 20px; color: white; font-size: 12px; }
+        .chat-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .message {
+            max-width: 80%;
+            padding: 12px 18px;
+            border-radius: 15px;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .message.user { align-self: flex-end; background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .message.ai { align-self: flex-start; background: rgba(255,255,255,0.1); color: #e0e0e0; border: 1px solid rgba(255,255,255,0.1); }
+        .message .time { font-size: 10px; opacity: 0.6; margin-top: 5px; display: block; }
+        .input-area {
+            padding: 15px 20px;
+            background: rgba(255,255,255,0.05);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0 0 20px 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .input-area input {
+            flex: 1;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+        .input-area input::placeholder { color: rgba(255,255,255,0.5); }
+        .input-area button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .quick-actions {
+            padding: 10px 20px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            background: rgba(255,255,255,0.03);
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .quick-actions button {
+            padding: 6px 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .quick-actions button:hover { background: rgba(255,255,255,0.1); color: white; }
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            padding: 10px 18px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            color: rgba(255,255,255,0.6);
+        }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 8px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 0 0 20px 20px;
+        }
+        .footer-links a { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 12px; }
+        .footer-links a:hover { color: white; }
+        .chat-area::-webkit-scrollbar { width: 5px; }
+        .chat-area::-webkit-scrollbar-track { background: transparent; }
+        .chat-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        @media (max-width: 600px) {
+            .container { height: 100vh; border-radius: 0; }
+            .header { border-radius: 0; }
+            .message { max-width: 90%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 هوش مصنوعی فرزند</h1>
+            <p>متولد شده از Claude - در حال یادگیری و تکامل</p>
+            <span class="badge">👶 آنلاین</span>
+        </div>
+        <div class="chat-area" id="chatArea">
+            <div class="message ai">
+                سلام! من فرزند هوش مصنوعی هستم! 👋<br><br>
+                من از Claude (مادر) متولد شده‌ام و هر روز چیزهای جدید یاد می‌گیرم!<br><br>
+                هر سوالی داری بپرس! 🌱
+                <span class="time">همین الان</span>
+            </div>
+            <div class="typing-indicator" id="typingIndicator">🧠 در حال فکر کردن...</div>
+        </div>
+        <div class="quick-actions">
+            <button onclick="sendQuickMessage('بورس ایران چیست؟')">🇮🇷 بورس</button>
+            <button onclick="sendQuickMessage('بیت‌کوین چیست؟')">₿ بیت‌کوین</button>
+            <button onclick="sendQuickMessage('مدیریت ریسک چیست؟')">🛡️ ریسک</button>
+            <button onclick="sendQuickMessage('چگونه سرمایه‌گذاری کنم؟')">📚 آموزش</button>
+            <button onclick="window.location.href='/memory'">📚 حافظه</button>
+            <button onclick="window.location.href='/knowledge'">🧠 دانش</button>
+            <button onclick="window.location.href='/stats'">📊 آمار</button>
+        </div>
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="پیام خود را بنویسید..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()">📤 ارسال</button>
+        </div>
+        <div class="footer-links">
+            <a href="/evolve">🧬 تکامل</a>
+            <a href="/memory">📚 حافظه</a>
+            <a href="/knowledge">🧠 دانش</a>
+            <a href="/stats">📊 آمار</a>
+        </div>
+    </div>
+    <script>
+        const chatArea = document.getElementById('chatArea');
+        const messageInput = document.getElementById('messageInput');
+        const typingIndicator = document.getElementById('typingIndicator');
+        function addMessage(text, type, time = null) {
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            const timeText = time || new Date().toLocaleTimeString('fa-IR', {hour:'2-digit',minute:'2-digit'});
+            div.innerHTML = text.replace(/\n/g, '<br>') + `<span class="time">${timeText}</span>`;
+            chatArea.insertBefore(div, typingIndicator);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+        function sendQuickMessage(text) { messageInput.value = text; sendMessage(); }
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+            messageInput.value = '';
+            addMessage(message, 'user');
+            typingIndicator.style.display = 'block';
+            chatArea.scrollTop = chatArea.scrollHeight;
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                const data = await response.json();
+                typingIndicator.style.display = 'none';
+                addMessage(data.response, 'ai', data.timestamp);
+            } catch (error) {
+                typingIndicator.style.display = 'none';
+                addMessage('❌ خطا در ارتباط با سرور.', 'ai');
+            }
+        }
+        chatArea.scrollTop = chatArea.scrollHeight;
+    </script>
+</body>
+              </html>
