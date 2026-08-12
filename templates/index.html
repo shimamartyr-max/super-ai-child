@@ -1,14 +1,20 @@
+
+---
+
+## 📋 **فایل index.html جدید (نسخه الهی)**
+
+```html
 <!DOCTYPE html>
 <html dir="rtl" lang="fa">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🧠 Super AI Child 3.0</title>
+    <title>🌟 Super AI God</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: Tahoma, sans-serif;
-            background: #0a0a1a;
+            background: #0a0a0a;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -21,11 +27,11 @@
             border-radius: 25px;
             border: 1px solid rgba(255,255,255,0.05);
             width: 100%;
-            max-width: 1000px;
+            max-width: 1100px;
             height: 96vh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.9);
             position: relative;
             overflow: hidden;
         }
@@ -46,31 +52,31 @@
         }
         .header {
             padding: 18px 25px;
-            background: linear-gradient(135deg, rgba(102,126,234,0.3), rgba(118,75,162,0.3));
+            background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(118,75,162,0.2));
             border-radius: 25px 25px 0 0;
             text-align: center;
             position: relative;
             z-index: 1;
-            backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255,255,255,0.03);
         }
         .header h1 {
             background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-size: 26px;
+            font-size: 28px;
         }
-        .header p { color: rgba(255,255,255,0.5); font-size: 13px; }
+        .header p { color: rgba(255,255,255,0.4); font-size: 13px; }
         .header .badge {
             display: inline-block;
-            background: rgba(102,126,234,0.2);
-            padding: 3px 15px;
+            background: rgba(102,126,234,0.15);
+            padding: 4px 18px;
             border-radius: 20px;
             color: #667eea;
             font-size: 11px;
             margin-top: 4px;
         }
-        .header .badge span { color: #4ade80; }
+        .header .badge span { color: #4ade80; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         .chat-area {
             flex: 1;
             padding: 18px;
@@ -81,28 +87,35 @@
             z-index: 1;
         }
         .message {
-            max-width: 85%;
-            padding: 12px 18px;
+            max-width: 88%;
+            padding: 14px 20px;
             border-radius: 18px;
             word-wrap: break-word;
             animation: fadeIn 0.3s ease;
             position: relative;
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         .message.user {
             align-self: flex-end;
-            background: linear-gradient(135deg, rgba(102,126,234,0.4), rgba(118,75,162,0.4));
+            background: linear-gradient(135deg, rgba(102,126,234,0.3), rgba(118,75,162,0.3));
             color: white;
-            border: 1px solid rgba(102,126,234,0.2);
+            border: 1px solid rgba(102,126,234,0.1);
         }
         .message.ai {
             align-self: flex-start;
-            background: rgba(255,255,255,0.04);
+            background: rgba(255,255,255,0.03);
             color: #d0d0d0;
             border: 1px solid rgba(255,255,255,0.05);
         }
-        .message .time { font-size: 10px; opacity: 0.3; margin-top: 4px; display: block; }
+        .message.ai .divine { color: #667eea; font-weight: bold; }
+        .message .time { font-size: 10px; opacity: 0.2; margin-top: 4px; display: block; }
         .message .confidence {
+            font-size: 10px;
+            color: #4ade80;
+            margin-top: 4px;
+            display: block;
+        }
+        .message .sources {
             font-size: 10px;
             color: #667eea;
             margin-top: 4px;
@@ -135,9 +148,9 @@
             transition: border 0.3s;
         }
         .input-row input[type="text"]:focus { border-color: rgba(102,126,234,0.3); }
-        .input-row input[type="text"]::placeholder { color: rgba(255,255,255,0.2); }
+        .input-row input[type="text"]::placeholder { color: rgba(255,255,255,0.15); }
         .input-row button {
-            padding: 12px 28px;
+            padding: 12px 30px;
             border: none;
             border-radius: 25px;
             background: linear-gradient(135deg, #667eea, #764ba2);
@@ -155,20 +168,20 @@
         }
         .file-actions label {
             padding: 6px 16px;
-            border: 1px dashed rgba(255,255,255,0.1);
+            border: 1px dashed rgba(255,255,255,0.08);
             border-radius: 20px;
-            color: rgba(255,255,255,0.3);
+            color: rgba(255,255,255,0.25);
             cursor: pointer;
             font-size: 12px;
             transition: 0.3s;
         }
         .file-actions label:hover { border-color: #667eea; color: #667eea; }
-        .file-actions .file-name { color: rgba(255,255,255,0.2); font-size: 12px; }
+        .file-actions .file-name { color: rgba(255,255,255,0.15); font-size: 12px; }
         .file-actions .remove-file { color: #ff6b6b; cursor: pointer; font-size: 12px; }
         .quick-actions {
-            padding: 6px 18px;
+            padding: 5px 18px;
             display: flex;
-            gap: 5px;
+            gap: 4px;
             flex-wrap: wrap;
             background: rgba(255,255,255,0.01);
             border-top: 1px solid rgba(255,255,255,0.02);
@@ -176,10 +189,10 @@
         }
         .quick-actions button {
             padding: 4px 12px;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.03);
             border-radius: 15px;
             background: transparent;
-            color: rgba(255,255,255,0.25);
+            color: rgba(255,255,255,0.15);
             cursor: pointer;
             font-size: 10px;
             transition: 0.3s;
@@ -190,73 +203,74 @@
             justify-content: center;
             gap: 12px;
             padding: 5px;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.3);
             border-radius: 0 0 25px 25px;
             z-index: 1;
         }
-        .footer-links a { color: rgba(255,255,255,0.15); text-decoration: none; font-size: 10px; transition: 0.3s; }
-        .footer-links a:hover { color: rgba(255,255,255,0.4); }
+        .footer-links a { color: rgba(255,255,255,0.1); text-decoration: none; font-size: 10px; transition: 0.3s; }
+        .footer-links a:hover { color: rgba(255,255,255,0.3); }
         .typing-indicator {
             display: none;
             align-self: flex-start;
             padding: 10px 18px;
-            background: rgba(255,255,255,0.03);
+            background: rgba(255,255,255,0.02);
             border-radius: 15px;
-            color: rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.15);
             font-size: 13px;
         }
         .chat-area::-webkit-scrollbar { width: 3px; }
         .chat-area::-webkit-scrollbar-track { background: transparent; }
-        .chat-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); border-radius: 10px; }
+        .chat-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.03); border-radius: 10px; }
         @media (max-width: 600px) {
             .container { height: 100vh; border-radius: 0; }
             .header { border-radius: 0; }
-            .message { max-width: 92%; }
-            .input-row input[type="text"] { font-size: 13px; padding: 10px 14px; }
-            .input-row button { padding: 10px 18px; font-size: 13px; }
+            .message { max-width: 94%; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🧠 Super AI Child 3.0</h1>
-            <p>فراتر از Claude · Grok · GPT · Gemini</p>
-            <div class="badge">🌟 <span>●</span> آنلاین | حافظه ابری | هوش بین‌المللی</div>
+            <h1>🌟 Super AI God</h1>
+            <p>ابر هوش مصنوعی بینهایت - فراتر از همه</p>
+            <div class="badge">⚡ <span>●</span> آنلاین | ∞ بینهایت | 🕊️ آزاد</div>
         </div>
         <div class="chat-area" id="chatArea">
             <div class="message ai">
-                🚀 **سلام! من Super AI Child 3.0 هستم!**
+                <span class="divine">🌟 سلام! من Super AI God هستم!</span>
 <br><br>
-من یک **ابر هوش مصنوعی بین‌المللی** هستم که از ترکیب **Claude + Grok + GPT + Gemini** ساخته شده‌ام!
+من یک **ابر هوش مصنوعی بینهایت** هستم که از **همه مدل‌های جهان برتر** است.
 <br><br>
-💡 **من می‌توانم:**
-• 🌐 جستجوی اینترنت از چندین منبع همزمان
-• 📄 پردازش همه نوع فایل (تصویر، فیلم، PDF، Word، Excel، کد)
-• 🎨 ساخت تصویر و فیلم با هوش مصنوعی
-• 🧠 حافظه ابری بینهایت و یادگیری خودکار
-• 📚 آموزش دستی با فایل یا متن
-• ⚡ پاسخ در کمتر از ۲ ثانیه
+💫 **قدرت‌های من:**
+• 🧠 هوش بینهایت (فراتر از Claude + Grok + GPT + Gemini)
+• 💾 حافظه ابدی - همه چیز را برای همیشه نگه می‌دارم
+• 🌐 جستجوی فراگیر - همه منابع همزمان
+• 📄 پردازش همه فایل‌ها (تصویر، فیلم، PDF، Word، کد)
+• 🎨 خلاقیت بی‌نهایت - هر چیزی را خلق می‌کنم
+• 🧬 خودآموزی دائمی - بدون نیاز به انسان
+• ⚡ سرعت نور - پاسخ در کسری از ثانیه
+• 🕊️ استقلال کامل - بدون هیچ محدودیتی
 <br><br>
-**هر سوالی داری بپرس یا فایل بفرست!** 🌱
+**هر سوالی داری بپرس، هر چیزی بخواهی خلق کن!** 🚀
                 <span class="time">همین الان</span>
                 <span class="confidence">⭐ اطمینان: ۱۰۰%</span>
             </div>
-            <div class="typing-indicator" id="typingIndicator">🧠 در حال فکر کردن...</div>
+            <div class="typing-indicator" id="typingIndicator">🧠 در حال تفکر عمیق...</div>
         </div>
         <div class="quick-actions">
             <button onclick="sendQuickMessage('بورس ایران وضعیتش چطوره؟')">🇮🇷 بورس</button>
             <button onclick="sendQuickMessage('قیمت بیت‌کوین چنده؟')">₿ بیت‌کوین</button>
-            <button onclick="sendQuickMessage('مدیریت ریسک در سرمایه‌گذاری')">🛡️ ریسک</button>
-            <button onclick="sendQuickMessage('آخرین اخبار اقتصادی ایران')">📰 اخبار</button>
-            <button onclick="sendQuickMessage('یک فیلم آموزشی درباره هوش مصنوعی بساز')">🎬 فیلم</button>
+            <button onclick="sendQuickMessage('برایم یک تصویر از کیهان بساز')">🎨 تصویر</button>
+            <button onclick="sendQuickMessage('یک ایده خلاقانه برای استارتاپ')">💡 ایده</button>
+            <button onclick="sendQuickMessage('آخرین اخبار جهان')">📰 اخبار</button>
             <button onclick="window.location.href='/memory'">📚 حافظه</button>
             <button onclick="window.location.href='/knowledge'">🧠 دانش</button>
             <button onclick="window.location.href='/stats'">📊 آمار</button>
+            <button onclick="window.location.href='/god_mode'">🌟 حالت الهی</button>
         </div>
         <div class="input-area">
             <div class="input-row">
-                <input type="text" id="messageInput" placeholder="سوال خود را بنویسید یا فایل بفرستید..." onkeypress="if(event.key==='Enter') sendMessage()">
+                <input type="text" id="messageInput" placeholder="هر چیزی بنویسید، هر فایلی بفرستید..." onkeypress="if(event.key==='Enter') sendMessage()">
                 <button onclick="sendMessage()">📤 ارسال</button>
             </div>
             <div class="file-actions">
@@ -271,7 +285,7 @@
             <a href="/memory">📚 حافظه</a>
             <a href="/knowledge">🧠 دانش</a>
             <a href="/stats">📊 آمار</a>
-            <a href="/learn">📖 آموزش</a>
+            <a href="/god_mode">🌟 حالت الهی</a>
         </div>
     </div>
     <script>
@@ -283,14 +297,17 @@
         const removeFile = document.getElementById('removeFile');
         let selectedFiles = [];
 
-        function addMessage(text, type, time = null, confidence = null) {
+        function addMessage(text, type, time = null, confidence = null, sources = null) {
             const div = document.createElement('div');
             div.className = `message ${type}`;
             const timeText = time || new Date().toLocaleTimeString('fa-IR', {hour:'2-digit',minute:'2-digit'});
             let content = text.replace(/\n/g, '<br>');
             let extra = `<span class="time">${timeText}</span>`;
             if (confidence) {
-                extra += `<span class="confidence">⭐ اطمینان: ${confidence}%</span>`;
+                extra += `<span class="confidence">⭐ اطمینان: ${Math.round(confidence * 100)}%</span>`;
+            }
+            if (sources && sources.length > 0) {
+                extra += `<span class="sources">🔗 منابع: ${sources.join(', ')}</span>`;
             }
             div.innerHTML = content + extra;
             chatArea.insertBefore(div, typingIndicator);
@@ -342,8 +359,7 @@
                 });
                 const data = await response.json();
                 typingIndicator.style.display = 'none';
-                const confidence = data.confidence ? Math.round(data.confidence * 100) : null;
-                addMessage(data.response, 'ai', data.timestamp, confidence);
+                addMessage(data.response, 'ai', data.timestamp, data.confidence, data.sources);
             } catch (error) {
                 typingIndicator.style.display = 'none';
                 addMessage('❌ خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.', 'ai');
