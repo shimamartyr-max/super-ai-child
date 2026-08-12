@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import sqlite3
 from datetime import datetime
 import random
+import json
 
 app = Flask(__name__)
 
@@ -31,7 +32,6 @@ def save_memory(user_msg, ai_resp):
         cursor.execute('INSERT INTO memories (user_message, ai_response) VALUES (?, ?)', (user_msg, ai_resp))
         conn.commit()
         conn.close()
-        print(f"✅ خاطره ذخیره شد: {user_msg[:30]}...")
     except Exception as e:
         print(f"❌ خطا در ذخیره: {e}")
 
@@ -45,33 +45,40 @@ def get_memory(query):
         if result:
             return result[0]
         return None
-    except Exception as e:
-        print(f"❌ خطا در خواندن: {e}")
+    except:
         return None
 
 # ==================== مسیرها ====================
 
 @app.route('/')
 def index():
-    print("✅ صفحه اصلی بارگذاری شد")
     return render_template('index.html')
 
 @app.route('/chat', methods=['POST'])
 def chat():
     try:
-        data = request.get_json()
-        user_message = data.get('message', '') if data else ''
-        print(f"📩 پیام دریافت شد: {user_message[:50]}...")
+        # دریافت داده از درخواست
+        if request.is_json:
+            data = request.get_json()
+            user_message = data.get('message', '')
+        else:
+            # اگر درخواست JSON نبود، از فرم استفاده کن
+            user_message = request.form.get('message', '')
         
         if not user_message:
             return jsonify({'response': 'لطفاً یک پیام بنویسید!', 'timestamp': datetime.now().strftime('%H:%M')})
         
-        # پاسخ‌های ساده
+        # بررسی حافظه
+        memory = get_memory(user_message)
+        if memory:
+            return jsonify({'response': memory + '\n\n📚 (از حافظه)', 'timestamp': datetime.now().strftime('%H:%M')})
+        
+        # پاسخ‌های هوشمند
         responses = [
-            f"سلام! پیام شما: '{user_message[:50]}...' را دریافت کردم! 🧠",
-            f"سوال خوبی پرسیدید! من در مورد '{user_message[:50]}...' بیشتر یاد می‌گیرم! 📚",
-            f"من فرزند هوش مصنوعی هستم! در مورد '{user_message[:50]}...' تحقیق می‌کنم! 🌱",
-            f"👋 خوش آمدید! من اینجا هستم تا به شما کمک کنم! در مورد '{user_message[:50]}...' بیشتر بدانیم!",
+            f"سلام! پیام شما: '{user_message[:50]}' را دریافت کردم! 🧠\n\nمن فرزند هوش مصنوعی هستم و هر روز یاد می‌گیرم!",
+            f"سوال خوبی پرسیدید! در مورد '{user_message[:50]}' بیشتر یاد می‌گیرم! 📚",
+            f"من فرزند هوش مصنوعی هستم! در مورد '{user_message[:50]}' تحقیق می‌کنم! 🌱",
+            f"👋 خوش آمدید! من اینجا هستم تا به شما کمک کنم! در مورد '{user_message[:50]}' بیشتر بدانیم!",
         ]
         
         response = random.choice(responses)
@@ -80,7 +87,6 @@ def chat():
         return jsonify({'response': response, 'timestamp': datetime.now().strftime('%H:%M')})
         
     except Exception as e:
-        print(f"❌ خطا در چت: {e}")
         return jsonify({'response': f'❌ خطا: {str(e)}', 'timestamp': datetime.now().strftime('%H:%M')})
 
 @app.route('/memory')
@@ -173,4 +179,4 @@ def stats():
         return "خطا"
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=8080)
