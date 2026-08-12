@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🧠 هوش مصنوعی فرزند</title>
+    <title>🧠 هوش مصنوعی فرزند 2.0</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: Tahoma, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -17,24 +17,46 @@
         }
         .container {
             background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
             border-radius: 20px;
             border: 1px solid rgba(255,255,255,0.1);
             width: 100%;
-            max-width: 800px;
-            height: 90vh;
+            max-width: 900px;
+            height: 95vh;
             display: flex;
             flex-direction: column;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.7);
         }
         .header {
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 20px 25px;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
             border-radius: 20px 20px 0 0;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
-        .header h1 { color: white; font-size: 24px; }
-        .header p { color: rgba(255,255,255,0.8); font-size: 14px; }
-        .header .badge { background: rgba(255,255,255,0.2); padding: 3px 12px; border-radius: 20px; color: white; font-size: 12px; }
+        .header::before {
+            content: '🧠';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 40px;
+            opacity: 0.3;
+        }
+        .header h1 { color: white; font-size: 26px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .header p { color: rgba(255,255,255,0.85); font-size: 14px; }
+        .header .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.25);
+            padding: 3px 15px;
+            border-radius: 20px;
+            color: white;
+            font-size: 12px;
+            margin-top: 5px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .chat-area {
             flex: 1;
             padding: 20px;
@@ -44,36 +66,43 @@
             gap: 10px;
         }
         .message {
-            max-width: 80%;
+            max-width: 85%;
             padding: 12px 18px;
-            border-radius: 15px;
+            border-radius: 18px;
             word-wrap: break-word;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.4s ease;
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .message.user { align-self: flex-end; background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
-        .message.ai { align-self: flex-start; background: rgba(255,255,255,0.1); color: #e0e0e0; border: 1px solid rgba(255,255,255,0.1); }
-        .message .time { font-size: 10px; opacity: 0.6; margin-top: 5px; display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .message.user { align-self: flex-end; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-bottom-right-radius: 5px; }
+        .message.ai { align-self: flex-start; background: rgba(255,255,255,0.08); color: #e0e0e0; border: 1px solid rgba(255,255,255,0.1); border-bottom-left-radius: 5px; }
+        .message.ai .file-info { background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 8px; margin-top: 5px; font-size: 12px; color: #aaa; }
+        .message .time { font-size: 10px; opacity: 0.5; margin-top: 5px; display: block; }
         .input-area {
             padding: 15px 20px;
-            background: rgba(255,255,255,0.05);
-            border-top: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.03);
+            border-top: 1px solid rgba(255,255,255,0.05);
             border-radius: 0 0 20px 20px;
             display: flex;
+            flex-direction: column;
             gap: 10px;
         }
-        .input-area input {
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .input-row input[type="text"] {
             flex: 1;
             padding: 12px 18px;
             border: none;
             border-radius: 25px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.08);
             color: white;
             font-size: 14px;
             outline: none;
         }
-        .input-area input::placeholder { color: rgba(255,255,255,0.5); }
-        .input-area button {
+        .input-row input[type="text"]::placeholder { color: rgba(255,255,255,0.4); }
+        .input-row button {
             padding: 12px 25px;
             border: none;
             border-radius: 25px;
@@ -81,81 +110,127 @@
             color: white;
             font-weight: bold;
             cursor: pointer;
+            transition: transform 0.2s;
         }
-        .quick-actions {
-            padding: 10px 20px;
+        .input-row button:hover { transform: scale(1.05); }
+        .input-row button:active { transform: scale(0.95); }
+        .file-actions {
             display: flex;
-            gap: 8px;
+            gap: 10px;
+            align-items: center;
             flex-wrap: wrap;
-            background: rgba(255,255,255,0.03);
-            border-top: 1px solid rgba(255,255,255,0.05);
         }
-        .quick-actions button {
-            padding: 6px 15px;
-            border: 1px solid rgba(255,255,255,0.2);
+        .file-actions label {
+            padding: 8px 16px;
+            border: 1px dashed rgba(255,255,255,0.3);
             border-radius: 20px;
-            background: transparent;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255,255,255,0.6);
             cursor: pointer;
             font-size: 12px;
+            transition: all 0.3s;
         }
-        .quick-actions button:hover { background: rgba(255,255,255,0.1); color: white; }
+        .file-actions label:hover { background: rgba(255,255,255,0.05); border-color: #667eea; }
+        .file-actions .file-name { color: rgba(255,255,255,0.4); font-size: 12px; }
+        .file-actions .remove-file { color: #ff6b6b; cursor: pointer; font-size: 12px; }
+        .quick-actions {
+            padding: 8px 20px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            background: rgba(255,255,255,0.02);
+            border-top: 1px solid rgba(255,255,255,0.03);
+        }
+        .quick-actions button {
+            padding: 5px 12px;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 15px;
+            background: transparent;
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.3s;
+        }
+        .quick-actions button:hover { background: rgba(255,255,255,0.05); color: white; }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 6px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 0 0 20px 20px;
+        }
+        .footer-links a { color: rgba(255,255,255,0.3); text-decoration: none; font-size: 11px; transition: color 0.3s; }
+        .footer-links a:hover { color: white; }
         .typing-indicator {
             display: none;
             align-self: flex-start;
             padding: 10px 18px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
             border-radius: 15px;
-            color: rgba(255,255,255,0.6);
+            color: rgba(255,255,255,0.5);
+            font-size: 13px;
         }
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            padding: 8px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 0 0 20px 20px;
+        .typing-indicator .dots::after {
+            content: '...';
+            animation: typing 1.5s infinite;
         }
-        .footer-links a { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 12px; }
-        .footer-links a:hover { color: white; }
-        .chat-area::-webkit-scrollbar { width: 5px; }
+        @keyframes typing { 0% { content: ''; } 33% { content: '.'; } 66% { content: '..'; } 100% { content: '...'; } }
+        .chat-area::-webkit-scrollbar { width: 4px; }
         .chat-area::-webkit-scrollbar-track { background: transparent; }
-        .chat-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        .chat-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
         @media (max-width: 600px) {
             .container { height: 100vh; border-radius: 0; }
             .header { border-radius: 0; }
-            .message { max-width: 90%; }
+            .message { max-width: 92%; }
+            .input-row input[type="text"] { font-size: 13px; padding: 10px 14px; }
+            .input-row button { padding: 10px 18px; font-size: 13px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🧠 هوش مصنوعی فرزند</h1>
-            <p>متولد شده از Claude - در حال یادگیری و تکامل</p>
-            <span class="badge">👶 آنلاین</span>
+            <h1>🧠 هوش مصنوعی فرزند 2.0</h1>
+            <p>متولد شده از Claude - سطح Grok+</p>
+            <span class="badge">🌟 آنلاین | جستجوی اینترنت | پردازش فایل</span>
         </div>
         <div class="chat-area" id="chatArea">
             <div class="message ai">
-                سلام! من فرزند هوش مصنوعی هستم! 👋<br><br>
-                من از Claude (مادر) متولد شده‌ام و هر روز چیزهای جدید یاد می‌گیرم!<br><br>
-                هر سوالی داری بپرس! 🌱
+                سلام! من نسخه ۲.۰ هوش مصنوعی فرزند هستم! 🚀<br><br>
+                💡 **من می‌توانم:**<br>
+                • 🌐 جستجوی اینترنت با دقت بالا<br>
+                • 📄 پردازش فایل (تصویر، PDF، Word، Excel)<br>
+                • 🎨 ساخت تصویر و فیلم با هوش مصنوعی<br>
+                • 🧠 حافظه نامحدود و یادگیری عمیق<br>
+                • 📊 تحلیل داده‌های مالی و بازار<br><br>
+                هر سوالی داری بپرس یا فایل بفرست! 🌱
                 <span class="time">همین الان</span>
             </div>
-            <div class="typing-indicator" id="typingIndicator">🧠 در حال فکر کردن...</div>
+            <div class="typing-indicator" id="typingIndicator">
+                🧠 در حال فکر کردن<span class="dots"></span>
+            </div>
         </div>
         <div class="quick-actions">
-            <button onclick="sendQuickMessage('بورس ایران چیست؟')">🇮🇷 بورس</button>
-            <button onclick="sendQuickMessage('بیت‌کوین چیست؟')">₿ بیت‌کوین</button>
-            <button onclick="sendQuickMessage('مدیریت ریسک چیست؟')">🛡️ ریسک</button>
-            <button onclick="sendQuickMessage('چگونه سرمایه‌گذاری کنم؟')">📚 آموزش</button>
+            <button onclick="sendQuickMessage('بورس ایران وضعیتش چطوره؟')">🇮🇷 بورس</button>
+            <button onclick="sendQuickMessage('قیمت بیت‌کوین چنده؟')">₿ بیت‌کوین</button>
+            <button onclick="sendQuickMessage('مدیریت ریسک در سرمایه‌گذاری')">🛡️ ریسک</button>
+            <button onclick="sendQuickMessage('آخرین اخبار اقتصادی ایران')">📰 اخبار</button>
+            <button onclick="sendQuickMessage('برایم یک تصویر از غروب خورشید بساز')">🎨 تصویر</button>
             <button onclick="window.location.href='/memory'">📚 حافظه</button>
             <button onclick="window.location.href='/knowledge'">🧠 دانش</button>
             <button onclick="window.location.href='/stats'">📊 آمار</button>
         </div>
         <div class="input-area">
-            <input type="text" id="messageInput" placeholder="پیام خود را بنویسید..." onkeypress="if(event.key==='Enter') sendMessage()">
-            <button onclick="sendMessage()">📤 ارسال</button>
+            <div class="input-row">
+                <input type="text" id="messageInput" placeholder="سوال خود را بنویسید یا فایل بفرستید..." onkeypress="if(event.key==='Enter') sendMessage()">
+                <button onclick="sendMessage()">📤 ارسال</button>
+            </div>
+            <div class="file-actions">
+                <label for="fileInput">📎 انتخاب فایل</label>
+                <input type="file" id="fileInput" style="display:none" multiple onchange="handleFileSelect(event)">
+                <span class="file-name" id="fileName">هیچ فایلی انتخاب نشده</span>
+                <span class="remove-file" onclick="clearFile()" id="removeFile" style="display:none;">❌ حذف</span>
+            </div>
         </div>
         <div class="footer-links">
             <a href="/evolve">🧬 تکامل</a>
@@ -168,36 +243,76 @@
         const chatArea = document.getElementById('chatArea');
         const messageInput = document.getElementById('messageInput');
         const typingIndicator = document.getElementById('typingIndicator');
-        function addMessage(text, type, time = null) {
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        const removeFile = document.getElementById('removeFile');
+        let selectedFiles = [];
+
+        function addMessage(text, type, time = null, fileInfo = null) {
             const div = document.createElement('div');
             div.className = `message ${type}`;
             const timeText = time || new Date().toLocaleTimeString('fa-IR', {hour:'2-digit',minute:'2-digit'});
-            div.innerHTML = text.replace(/\n/g, '<br>') + `<span class="time">${timeText}</span>`;
+            let content = text.replace(/\n/g, '<br>');
+            if (fileInfo) {
+                content += `<div class="file-info">📎 ${fileInfo}</div>`;
+            }
+            div.innerHTML = content + `<span class="time">${timeText}</span>`;
             chatArea.insertBefore(div, typingIndicator);
             chatArea.scrollTop = chatArea.scrollHeight;
         }
+
         function sendQuickMessage(text) { messageInput.value = text; sendMessage(); }
+
+        function handleFileSelect(event) {
+            selectedFiles = Array.from(event.target.files);
+            if (selectedFiles.length > 0) {
+                const names = selectedFiles.map(f => f.name).join(', ');
+                fileName.textContent = names;
+                removeFile.style.display = 'inline';
+            }
+        }
+
+        function clearFile() {
+            selectedFiles = [];
+            fileInput.value = '';
+            fileName.textContent = 'هیچ فایلی انتخاب نشده';
+            removeFile.style.display = 'none';
+        }
+
         async function sendMessage() {
             const message = messageInput.value.trim();
-            if (!message) return;
+            if (!message && selectedFiles.length === 0) return;
+            
+            const formData = new FormData();
+            formData.append('message', message);
+            
+            for (const file of selectedFiles) {
+                formData.append('file', file);
+            }
+            
+            const fileNames = selectedFiles.map(f => f.name).join(', ');
+            addMessage(message || '📎 ارسال فایل', 'user', null, fileNames || null);
+            
             messageInput.value = '';
-            addMessage(message, 'user');
+            clearFile();
+            
             typingIndicator.style.display = 'block';
             chatArea.scrollTop = chatArea.scrollHeight;
+            
             try {
                 const response = await fetch('/chat', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: message })
+                    body: formData
                 });
                 const data = await response.json();
                 typingIndicator.style.display = 'none';
                 addMessage(data.response, 'ai', data.timestamp);
             } catch (error) {
                 typingIndicator.style.display = 'none';
-                addMessage('❌ خطا در ارتباط با سرور.', 'ai');
+                addMessage('❌ خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.', 'ai');
             }
         }
+
         chatArea.scrollTop = chatArea.scrollHeight;
     </script>
 </body>
