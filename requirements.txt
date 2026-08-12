@@ -10,3 +10,4 @@ numpy
 aiohttp
 gunicorn
 pytesseract
+aiofiles
