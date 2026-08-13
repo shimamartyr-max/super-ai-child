@@ -4,5 +4,11 @@ beautifulsoup4
 googlesearch-python
 wikipedia
 yfinance
-textblob
-gunicorn
+cryptography
+paramiko
+python-nmap
+scapy
+psutil
+netifaces
+dnspython
+python-whois
