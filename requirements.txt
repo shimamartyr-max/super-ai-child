@@ -1,2 +1,10 @@
 flask
+requests
+beautifulsoup4
+googlesearch-python
+wikipedia
+yfinance
+textblob
+Pillow
+numpy
 gunicorn
