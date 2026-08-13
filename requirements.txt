@@ -5,6 +5,4 @@ googlesearch-python
 wikipedia
 yfinance
 textblob
-Pillow
-numpy
 gunicorn
