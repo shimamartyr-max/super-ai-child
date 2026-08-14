@@ -20,7 +20,7 @@
             border-radius: 25px;
             border: 1px solid rgba(255,255,255,0.05);
             width: 100%;
-            max-width: 1000px;
+            max-width: 900px;
             height: 95vh;
             display: flex;
             flex-direction: column;
@@ -36,9 +36,9 @@
             background: linear-gradient(135deg, #667eea, #764ba2);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-size: 26px;
+            font-size: 24px;
         }
-        .header p { color: rgba(255,255,255,0.3); font-size: 13px; }
+        .header p { color: rgba(255,255,255,0.3); font-size: 12px; }
         .header .badge {
             display: inline-block;
             background: rgba(102,126,234,0.1);
@@ -97,8 +97,7 @@
             font-size: 14px;
             outline: none;
         }
-        .input-row input[type="text"]:focus { border-color: rgba(102,126,234,0.3); }
-        .input-row input[type="text"]::placeholder { color: rgba(255,255,255,0.15); }
+        .input-row input[type="text"]::placeholder { color: rgba(255,255,255,0.2); }
         .input-row button {
             padding: 12px 28px;
             border: none;
@@ -108,38 +107,21 @@
             font-weight: bold;
             cursor: pointer;
         }
-        .file-actions {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            padding-top: 8px;
-            flex-wrap: wrap;
-        }
-        .file-actions label {
-            padding: 5px 14px;
-            border: 1px dashed rgba(255,255,255,0.08);
-            border-radius: 20px;
-            color: rgba(255,255,255,0.25);
-            cursor: pointer;
-            font-size: 12px;
-        }
-        .file-actions label:hover { border-color: #667eea; color: #667eea; }
-        .file-actions .file-name { color: rgba(255,255,255,0.15); font-size: 12px; }
-        .file-actions .remove-file { color: #ff6b6b; cursor: pointer; font-size: 12px; }
+        .input-row button:hover { opacity: 0.9; }
         .quick-actions {
             padding: 5px 18px;
             display: flex;
-            gap: 4px;
+            gap: 5px;
             flex-wrap: wrap;
             background: rgba(255,255,255,0.01);
             border-top: 1px solid rgba(255,255,255,0.02);
         }
         .quick-actions button {
             padding: 4px 12px;
-            border: 1px solid rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
             border-radius: 15px;
             background: transparent;
-            color: rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.2);
             cursor: pointer;
             font-size: 10px;
         }
@@ -152,7 +134,7 @@
             background: rgba(0,0,0,0.2);
             border-radius: 0 0 25px 25px;
         }
-        .footer-links a { color: rgba(255,255,255,0.08); text-decoration: none; font-size: 10px; }
+        .footer-links a { color: rgba(255,255,255,0.1); text-decoration: none; font-size: 10px; }
         .footer-links a:hover { color: rgba(255,255,255,0.3); }
         .typing-indicator {
             display: none;
@@ -165,7 +147,7 @@
         }
         .chat-area::-webkit-scrollbar { width: 3px; }
         .chat-area::-webkit-scrollbar-track { background: transparent; }
-        .chat-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.03); border-radius: 10px; }
+        .chat-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); border-radius: 10px; }
         @media (max-width: 600px) {
             .container { height: 100vh; border-radius: 0; }
             .header { border-radius: 0; }
@@ -177,35 +159,30 @@
     <div class="container">
         <div class="header">
             <h1>🌟 Super AI God</h1>
-            <p>ابر هوش مصنوعی بینهایت</p>
-            <div class="badge">⚡ آنلاین | ∞ بینهایت</div>
+            <p>هوش مصنوعی فوق‌پیشرفته</p>
+            <span class="badge">⚡ آنلاین | ∞ بینهایت</span>
         </div>
         <div class="chat-area" id="chatArea">
             <div class="message ai">
-                🌟 **سلام! من Super AI God هستم!**
-<br><br>
-من یک **ابر هوش مصنوعی بینهایت** هستم.
-<br><br>
-💫 **قدرت‌های من:**
-• 🧠 هوش بینهایت
-• 💾 حافظه ابدی
-• 🌐 جستجوی فراگیر
-• 📄 پردازش همه فایل‌ها
-• 🎨 خلاقیت بی‌نهایت
-• ⚡ سرعت نور
-<br><br>
-**هر سوالی داری بپرس!** 🚀
+                🌟 **سلام! من Super AI God هستم!**<br><br>
+                من یک **هوش مصنوعی فوق‌پیشرفته** هستم!<br><br>
+                💫 **قدرت‌های من:**<br>
+                • 🧠 هوش بینهایت<br>
+                • 💾 حافظه ابدی<br>
+                • 🌐 جستجوی فراگیر<br>
+                • 🎨 خلاقیت بی‌نهایت<br>
+                • ⚡ سرعت نور<br><br>
+                **هر سوالی داری بپرس!** 🚀
                 <span class="time">همین الان</span>
             </div>
             <div class="typing-indicator" id="typingIndicator">🧠 در حال تفکر...</div>
         </div>
         <div class="quick-actions">
+            <button onclick="sendQuickMessage('سلام! چطوری؟')">👋 سلام</button>
             <button onclick="sendQuickMessage('بورس ایران وضعیتش چطوره؟')">🇮🇷 بورس</button>
             <button onclick="sendQuickMessage('قیمت بیت‌کوین چنده؟')">₿ بیت‌کوین</button>
-            <button onclick="sendQuickMessage('برایم یک تصویر بساز')">🎨 تصویر</button>
-            <button onclick="sendQuickMessage('آخرین اخبار')">📰 اخبار</button>
+            <button onclick="sendQuickMessage('مدیریت ریسک چیست؟')">🛡️ ریسک</button>
             <button onclick="window.location.href='/memory'">📚 حافظه</button>
-            <button onclick="window.location.href='/knowledge'">🧠 دانش</button>
             <button onclick="window.location.href='/stats'">📊 آمار</button>
         </div>
         <div class="input-area">
@@ -213,17 +190,9 @@
                 <input type="text" id="messageInput" placeholder="هر چیزی بنویسید..." onkeypress="if(event.key==='Enter') sendMessage()">
                 <button onclick="sendMessage()">📤 ارسال</button>
             </div>
-            <div class="file-actions">
-                <label for="fileInput">📎 انتخاب فایل</label>
-                <input type="file" id="fileInput" style="display:none" onchange="handleFileSelect(event)">
-                <span class="file-name" id="fileName">هیچ فایلی انتخاب نشده</span>
-                <span class="remove-file" onclick="clearFile()" id="removeFile" style="display:none;">❌ حذف</span>
-            </div>
         </div>
         <div class="footer-links">
-            <a href="/evolve">🧬 تکامل</a>
             <a href="/memory">📚 حافظه</a>
-            <a href="/knowledge">🧠 دانش</a>
             <a href="/stats">📊 آمار</a>
         </div>
     </div>
@@ -231,10 +200,6 @@
         const chatArea = document.getElementById('chatArea');
         const messageInput = document.getElementById('messageInput');
         const typingIndicator = document.getElementById('typingIndicator');
-        const fileInput = document.getElementById('fileInput');
-        const fileName = document.getElementById('fileName');
-        const removeFile = document.getElementById('removeFile');
-        let selectedFile = null;
 
         function addMessage(text, type, time = null) {
             const div = document.createElement('div');
@@ -247,34 +212,12 @@
 
         function sendQuickMessage(text) { messageInput.value = text; sendMessage(); }
 
-        function handleFileSelect(event) {
-            selectedFile = event.target.files[0];
-            if (selectedFile) {
-                fileName.textContent = selectedFile.name;
-                removeFile.style.display = 'inline';
-            }
-        }
-
-        function clearFile() {
-            selectedFile = null;
-            fileInput.value = '';
-            fileName.textContent = 'هیچ فایلی انتخاب نشده';
-            removeFile.style.display = 'none';
-        }
-
         async function sendMessage() {
             const message = messageInput.value.trim();
-            if (!message && !selectedFile) return;
+            if (!message) return;
             
-            const formData = new FormData();
-            formData.append('message', message);
-            if (selectedFile) {
-                formData.append('file', selectedFile);
-            }
-            
-            addMessage(message || '📎 ارسال فایل', 'user');
             messageInput.value = '';
-            clearFile();
+            addMessage(message, 'user');
             
             typingIndicator.style.display = 'block';
             chatArea.scrollTop = chatArea.scrollHeight;
@@ -282,7 +225,8 @@
             try {
                 const response = await fetch('/chat', {
                     method: 'POST',
-                    body: formData
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
                 });
                 const data = await response.json();
                 typingIndicator.style.display = 'none';
