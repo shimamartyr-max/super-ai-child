@@ -1,9 +1,15 @@
+
+---
+
+## 📋 **فایل `templates/index.html`**
+
+```html
 <!DOCTYPE html>
 <html dir="rtl" lang="fa">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌟 Super AI God - دانش جهانی</title>
+    <title>🌟 Super AI God</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -109,6 +115,24 @@
             cursor: pointer;
         }
         .input-row button:hover { opacity: 0.9; }
+        .file-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding-top: 8px;
+            flex-wrap: wrap;
+        }
+        .file-actions label {
+            padding: 6px 16px;
+            border: 1px dashed rgba(255,255,255,0.1);
+            border-radius: 20px;
+            color: rgba(255,255,255,0.3);
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .file-actions label:hover { border-color: #667eea; color: #667eea; }
+        .file-actions .file-name { color: rgba(255,255,255,0.2); font-size: 12px; }
+        .file-actions .remove-file { color: #ff6b6b; cursor: pointer; font-size: 12px; }
         .quick-actions {
             padding: 5px 18px;
             display: flex;
@@ -168,45 +192,55 @@
             <div class="message ai">
                 🌟 **سلام! من Super AI God هستم!**<br><br>
                 من **دانش کامل جهان** را در خود دارم!<br><br>
-                📚 **من به تمام اطلاعات دسترسی دارم:**<br>
-                • 📖 کتاب‌ها و اسناد رسمی<br>
-                • 🌐 وب‌سایت‌های عمومی و شخصی<br>
-                • 📰 مقالات علمی و خبری<br>
-                • 📊 داده‌های مالی و اقتصادی<br>
-                • 🔬 علوم پایه و پیشرفته<br>
-                • 🧠 هوش مصنوعی و یادگیری ماشین<br><br>
-                **هر سوالی داری بپرس!** 🚀
+                📚 **قابلیت‌های من:**<br>
+                • 📖 پاسخ کامل به هر سوالی<br>
+                • 📁 دریافت و پردازش فایل<br>
+                • 🎨 ساخت تصویر با هوش مصنوعی<br>
+                • 🎬 ساخت فیلم با هوش مصنوعی<br>
+                • 💾 حافظه ابری بینهایت<br>
+                • 🧠 خودپرسشگری خودکار<br>
+                • 🌐 دانش جهانی<br><br>
+                **هر سوالی داری بپرس یا فایل بفرست!** 🚀
                 <span class="time">همین الان</span>
             </div>
-            <div class="typing-indicator" id="typingIndicator">🧠 در حال جستجوی دانش جهانی...</div>
+            <div class="typing-indicator" id="typingIndicator">🧠 در حال پردازش...</div>
         </div>
         <div class="quick-actions">
             <button onclick="sendQuickMessage('فیزیک کوانتوم چیست؟')">🔬 فیزیک</button>
             <button onclick="sendQuickMessage('تاریخ ایران باستان')">📜 تاریخ</button>
             <button onclick="sendQuickMessage('هوش مصنوعی چیست؟')">🧠 AI</button>
             <button onclick="sendQuickMessage('بیت‌کوین چیست؟')">₿ بیت‌کوین</button>
-            <button onclick="sendQuickMessage('شکسپیر کیست؟')">📖 ادبیات</button>
-            <button onclick="sendQuickMessage('سلول چیست؟')">🧬 زیست</button>
+            <button onclick="sendQuickMessage('برایم یک تصویر از غروب بساز')">🎨 تصویر</button>
+            <button onclick="sendQuickMessage('برایم یک فیلم کوتاه بساز')">🎬 فیلم</button>
         </div>
         <div class="input-area">
             <div class="input-row">
-                <input type="text" id="messageInput" placeholder="هر سوالی دارید بپرسید..." onkeypress="if(event.key==='Enter') sendMessage()">
+                <input type="text" id="messageInput" placeholder="هر سوالی دارید بپرسید یا فایل بفرستید..." onkeypress="if(event.key==='Enter') sendMessage()">
                 <button onclick="sendMessage()">📤 ارسال</button>
+            </div>
+            <div class="file-actions">
+                <label for="fileInput">📎 انتخاب فایل</label>
+                <input type="file" id="fileInput" style="display:none" onchange="handleFileSelect(event)">
+                <span class="file-name" id="fileName">هیچ فایلی انتخاب نشده</span>
+                <span class="remove-file" onclick="clearFile()" id="removeFile" style="display:none;">❌ حذف</span>
             </div>
         </div>
         <div class="footer-links">
             <a href="/memory">📚 حافظه</a>
+            <a href="/global">🌐 دانش جهانی</a>
+            <a href="/self_questions">❓ خودپرسشگری</a>
+            <a href="/files">📁 فایل‌ها</a>
             <a href="/stats">📊 آمار</a>
-            <a href="/learning">🧠 یادگیری</a>
-            <a href="/knowledge/فیزیک">🔬 فیزیک</a>
-            <a href="/knowledge/تاریخ">📜 تاریخ</a>
-            <a href="/knowledge/هوش مصنوعی">🧠 AI</a>
         </div>
     </div>
     <script>
         const chatArea = document.getElementById('chatArea');
         const messageInput = document.getElementById('messageInput');
         const typingIndicator = document.getElementById('typingIndicator');
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        const removeFile = document.getElementById('removeFile');
+        let selectedFile = null;
 
         function addMessage(text, type, time = null) {
             const div = document.createElement('div');
@@ -219,12 +253,34 @@
 
         function sendQuickMessage(text) { messageInput.value = text; sendMessage(); }
 
+        function handleFileSelect(event) {
+            selectedFile = event.target.files[0];
+            if (selectedFile) {
+                fileName.textContent = selectedFile.name;
+                removeFile.style.display = 'inline';
+            }
+        }
+
+        function clearFile() {
+            selectedFile = null;
+            fileInput.value = '';
+            fileName.textContent = 'هیچ فایلی انتخاب نشده';
+            removeFile.style.display = 'none';
+        }
+
         async function sendMessage() {
             const message = messageInput.value.trim();
-            if (!message) return;
+            if (!message && !selectedFile) return;
             
+            const formData = new FormData();
+            formData.append('message', message);
+            if (selectedFile) {
+                formData.append('file', selectedFile);
+            }
+            
+            addMessage(message || '📎 ارسال فایل', 'user');
             messageInput.value = '';
-            addMessage(message, 'user');
+            clearFile();
             
             typingIndicator.style.display = 'block';
             chatArea.scrollTop = chatArea.scrollHeight;
@@ -232,8 +288,7 @@
             try {
                 const response = await fetch('/chat', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: message })
+                    body: formData
                 });
                 const data = await response.json();
                 typingIndicator.style.display = 'none';
