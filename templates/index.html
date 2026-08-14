@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌟 Super AI God</title>
+    <title>🌟 Super AI God - دانش جهانی</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -20,7 +20,7 @@
             border-radius: 25px;
             border: 1px solid rgba(255,255,255,0.05);
             width: 100%;
-            max-width: 900px;
+            max-width: 1000px;
             height: 95vh;
             display: flex;
             flex-direction: column;
@@ -38,14 +38,14 @@
             -webkit-text-fill-color: transparent;
             font-size: 24px;
         }
-        .header p { color: rgba(255,255,255,0.3); font-size: 12px; }
+        .header p { color: rgba(255,255,255,0.3); font-size: 11px; }
         .header .badge {
             display: inline-block;
             background: rgba(102,126,234,0.1);
             padding: 3px 15px;
             border-radius: 20px;
             color: #667eea;
-            font-size: 11px;
+            font-size: 10px;
             margin-top: 4px;
         }
         .chat-area {
@@ -57,7 +57,7 @@
             gap: 8px;
         }
         .message {
-            max-width: 85%;
+            max-width: 90%;
             padding: 12px 18px;
             border-radius: 18px;
             word-wrap: break-word;
@@ -74,6 +74,7 @@
             background: rgba(255,255,255,0.03);
             color: #d0d0d0;
             border: 1px solid rgba(255,255,255,0.05);
+            max-width: 92%;
         }
         .message .time { font-size: 10px; opacity: 0.3; margin-top: 4px; display: block; }
         .input-area {
@@ -133,9 +134,10 @@
             padding: 5px;
             background: rgba(0,0,0,0.2);
             border-radius: 0 0 25px 25px;
+            flex-wrap: wrap;
         }
-        .footer-links a { color: rgba(255,255,255,0.1); text-decoration: none; font-size: 10px; }
-        .footer-links a:hover { color: rgba(255,255,255,0.3); }
+        .footer-links a { color: rgba(255,255,255,0.15); text-decoration: none; font-size: 10px; }
+        .footer-links a:hover { color: rgba(255,255,255,0.4); }
         .typing-indicator {
             display: none;
             align-self: flex-start;
@@ -151,7 +153,7 @@
         @media (max-width: 600px) {
             .container { height: 100vh; border-radius: 0; }
             .header { border-radius: 0; }
-            .message { max-width: 92%; }
+            .message { max-width: 95%; }
         }
     </style>
 </head>
@@ -159,41 +161,46 @@
     <div class="container">
         <div class="header">
             <h1>🌟 Super AI God</h1>
-            <p>هوش مصنوعی فوق‌پیشرفته</p>
-            <span class="badge">⚡ آنلاین | ∞ بینهایت</span>
+            <p>دانش کامل جهان - هوش بینهایت</p>
+            <span class="badge">⚡ آنلاین | 📚 دانش جهانی | ∞ بینهایت</span>
         </div>
         <div class="chat-area" id="chatArea">
             <div class="message ai">
                 🌟 **سلام! من Super AI God هستم!**<br><br>
-                من یک **هوش مصنوعی فوق‌پیشرفته** هستم!<br><br>
-                💫 **قدرت‌های من:**<br>
-                • 🧠 هوش بینهایت<br>
-                • 💾 حافظه ابدی<br>
-                • 🌐 جستجوی فراگیر<br>
-                • 🎨 خلاقیت بی‌نهایت<br>
-                • ⚡ سرعت نور<br><br>
+                من **دانش کامل جهان** را در خود دارم!<br><br>
+                📚 **من به تمام اطلاعات دسترسی دارم:**<br>
+                • 📖 کتاب‌ها و اسناد رسمی<br>
+                • 🌐 وب‌سایت‌های عمومی و شخصی<br>
+                • 📰 مقالات علمی و خبری<br>
+                • 📊 داده‌های مالی و اقتصادی<br>
+                • 🔬 علوم پایه و پیشرفته<br>
+                • 🧠 هوش مصنوعی و یادگیری ماشین<br><br>
                 **هر سوالی داری بپرس!** 🚀
                 <span class="time">همین الان</span>
             </div>
-            <div class="typing-indicator" id="typingIndicator">🧠 در حال تفکر...</div>
+            <div class="typing-indicator" id="typingIndicator">🧠 در حال جستجوی دانش جهانی...</div>
         </div>
         <div class="quick-actions">
-            <button onclick="sendQuickMessage('سلام! چطوری؟')">👋 سلام</button>
-            <button onclick="sendQuickMessage('بورس ایران وضعیتش چطوره؟')">🇮🇷 بورس</button>
-            <button onclick="sendQuickMessage('قیمت بیت‌کوین چنده؟')">₿ بیت‌کوین</button>
-            <button onclick="sendQuickMessage('مدیریت ریسک چیست؟')">🛡️ ریسک</button>
-            <button onclick="window.location.href='/memory'">📚 حافظه</button>
-            <button onclick="window.location.href='/stats'">📊 آمار</button>
+            <button onclick="sendQuickMessage('فیزیک کوانتوم چیست؟')">🔬 فیزیک</button>
+            <button onclick="sendQuickMessage('تاریخ ایران باستان')">📜 تاریخ</button>
+            <button onclick="sendQuickMessage('هوش مصنوعی چیست؟')">🧠 AI</button>
+            <button onclick="sendQuickMessage('بیت‌کوین چیست؟')">₿ بیت‌کوین</button>
+            <button onclick="sendQuickMessage('شکسپیر کیست؟')">📖 ادبیات</button>
+            <button onclick="sendQuickMessage('سلول چیست؟')">🧬 زیست</button>
         </div>
         <div class="input-area">
             <div class="input-row">
-                <input type="text" id="messageInput" placeholder="هر چیزی بنویسید..." onkeypress="if(event.key==='Enter') sendMessage()">
+                <input type="text" id="messageInput" placeholder="هر سوالی دارید بپرسید..." onkeypress="if(event.key==='Enter') sendMessage()">
                 <button onclick="sendMessage()">📤 ارسال</button>
             </div>
         </div>
         <div class="footer-links">
             <a href="/memory">📚 حافظه</a>
             <a href="/stats">📊 آمار</a>
+            <a href="/learning">🧠 یادگیری</a>
+            <a href="/knowledge/فیزیک">🔬 فیزیک</a>
+            <a href="/knowledge/تاریخ">📜 تاریخ</a>
+            <a href="/knowledge/هوش مصنوعی">🧠 AI</a>
         </div>
     </div>
     <script>
