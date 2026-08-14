@@ -24,7 +24,7 @@ def init_database():
         conn.close()
         print("✅ دیتابیس ساخته شد!")
     except Exception as e:
-        print(f"❌ خطا: {e}")
+        print(f"⚠️ خطا: {e}")
 
 init_database()
 
@@ -39,17 +39,12 @@ def save_chat(user_msg, ai_resp):
         pass
 
 def get_response(msg):
-    """پاسخ هوشمندانه"""
-    
-    # پاسخ‌های آماده
     responses = [
-        f"سلام! پیام شما: '{msg[:50]}...' را دریافت کردم! 🧠\n\nمن یک هوش مصنوعی فوق‌پیشرفته هستم!",
+        f"سلام! پیام شما: '{msg[:50]}...' را دریافت کردم! 🧠",
         f"سوال خوبی پرسیدید! در مورد '{msg[:50]}...' بیشتر یاد می‌گیرم! 📚",
         f"👋 خوش آمدید! من اینجا هستم تا به شما کمک کنم!",
         f"💡 سوال جالبی! بگذارید درباره '{msg[:50]}...' فکر کنم!",
-        f"🌟 '{msg[:50]}...' - من این موضوع رو تحلیل می‌کنم!"
     ]
-    
     response = random.choice(responses)
     save_chat(msg, response)
     return response
@@ -63,18 +58,13 @@ def index():
 @app.route('/chat', methods=['POST'])
 def chat():
     try:
-        # دریافت داده از هر دو صورت (JSON و FormData)
-        if request.is_json:
-            data = request.get_json()
-            user_message = data.get('message', '')
-        else:
-            user_message = request.form.get('message', '')
+        data = request.get_json()
+        user_message = data.get('message', '') if data else ''
         
         if not user_message:
             return jsonify({'response': '🌟 لطفاً پیام بنویسید!', 'timestamp': datetime.now().strftime('%H:%M')})
         
         response = get_response(user_message)
-        
         return jsonify({
             'response': response,
             'timestamp': datetime.now().strftime('%H:%M')
@@ -152,5 +142,6 @@ def stats():
         return "خطا"
 
 if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 8080))
     print("🚀 Super AI God راه‌اندازی شد!")
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=port)
