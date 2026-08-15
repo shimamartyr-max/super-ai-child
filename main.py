@@ -101,7 +101,7 @@ class CloudMemory:
             conn.close()
             print("✅ حافظه ابری راه‌اندازی شد!")
         except Exception as e:
-            print(f"⚠️ خطا: {e}")
+            print(return f"📄 فایل کد دریافت شد!")
     
     def _load_global_knowledge(self):
         categories = {
