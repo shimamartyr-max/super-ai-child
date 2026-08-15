@@ -47,7 +47,6 @@ class CloudMemory:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
-            # حافظه اصلی
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS memory (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -59,7 +58,6 @@ class CloudMemory:
                 )
             ''')
             
-            # دانش جهانی
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS global_knowledge (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -71,7 +69,6 @@ class CloudMemory:
                 )
             ''')
             
-            # مکالمات
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS chats (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -81,7 +78,6 @@ class CloudMemory:
                 )
             ''')
             
-            # فایل‌ها
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS files (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -92,7 +88,6 @@ class CloudMemory:
                 )
             ''')
             
-            # خودپرسشگری
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS self_questions (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -109,7 +104,6 @@ class CloudMemory:
             print(f"⚠️ خطا: {e}")
     
     def _load_global_knowledge(self):
-        """بارگذاری دانش جهانی"""
         categories = {
             'فیزیک': ['قوانین نیوتن', 'نظریه نسبیت', 'مکانیک کوانتوم', 'گرانش', 'نیروهای بنیادی'],
             'شیمی': ['جدول تناوبی', 'واکنش‌های شیمیایی', 'پیوند مولکولی', 'اسید و باز'],
@@ -360,24 +354,11 @@ class ContentGenerator:
     
     @staticmethod
     def generate_image(prompt):
-        """تولید تصویر"""
-        # برای تولید واقعی نیاز به API دارد
-        images = [
-            "🎨 تصویر بر اساس درخواست شما ساخته شد!",
-            f"🖼️ '{prompt}' - یک تصویر زیبا!",
-            "🎨 تصویر تولید شد!",
-        ]
-        return random.choice(images)
+        return f"🎨 تصویر بر اساس درخواست '{prompt}' ساخته شد!"
     
     @staticmethod
     def generate_video(prompt):
-        """تولید فیلم"""
-        videos = [
-            "🎬 فیلم بر اساس درخواست شما ساخته شد!",
-            f"📽️ '{prompt}' - یک فیلم جذاب!",
-            "🎬 فیلم تولید شد!",
-        ]
-        return random.choice(videos)
+        return f"🎬 فیلم بر اساس درخواست '{prompt}' ساخته شد!"
 
 # ==================== خودپرسشگری ====================
 
@@ -412,17 +393,15 @@ class SelfQuestioning:
         while self.is_running:
             try:
                 topic = random.choice(topics)
-                answer = self._generate_answer(topic)
+                search_results = WorldSearch.search_all(topic)
+                if search_results['content']:
+                    answer = f"پاسخ به '{topic}':\n\n{search_results['content'][0][:500]}"
+                else:
+                    answer = f"در مورد '{topic}' در حال یادگیری هستم."
                 db.save_self_question(topic, answer)
-                time.sleep(60)  # هر ۱ دقیقه یک سوال
+                time.sleep(60)
             except:
                 time.sleep(10)
-    
-    def _generate_answer(self, question):
-        search_results = WorldSearch.search_all(question)
-        if search_results['content']:
-            return f"پاسخ به '{question}':\n\n{search_results['content'][0][:500]}"
-        return f"در مورد '{question}' در حال یادگیری هستم."
 
 self_questioning = SelfQuestioning()
 self_questioning.start()
@@ -435,13 +414,9 @@ def generate_response(user_message, file_data=None):
     if file_data:
         return process_file(file_data)
     
-    # ذخیره در حافظه
     db.save_memory(user_message, "question", "chat", "user")
-    
-    # جستجوی جهانی
     search_results = WorldSearch.search_all(user_message)
     
-    # ساخت پاسخ
     if len(search_results['content']) > 1:
         response = f"""
 🌟 **پاسخ کامل به: "{user_message}"**
@@ -467,10 +442,8 @@ def generate_response(user_message, file_data=None):
 💡 برای اطلاعات بیشتر، سوال خود را دقیق‌تر بپرسید.
 """
     
-    # ذخیره پاسخ
     db.save_memory(response, "answer", "chat", "ai")
     db.save_chat(user_message, response)
-    
     return response
 
 def process_file(file_data):
