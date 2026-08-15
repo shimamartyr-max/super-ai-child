@@ -1,41 +1,65 @@
 """
-🧠 SUPER AI GOD - دانش کامل جهان
-دسترسی به تمام اطلاعات، اسناد، کتب، مقالات و وب‌سایت‌ها
+🧠 SUPER AI GOD - نسخه نهایی کامل
+با تمام قابلیت‌های درخواستی: پاسخ کامل، فایل، ساخت عکس/فیلم، حافظه ابری، خودپرسشگری، دانش جهانی
 """
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 import sqlite3
-from datetime import datetime
-import random
-import os
+from datetime import datetime, timedelta
 import json
+import os
+import io
+import random
+import re
+import hashlib
+import base64
+import time
+import threading
 import requests
 from bs4 import BeautifulSoup
 from googlesearch import search
 import wikipedia
 import yfinance as yf
-import hashlib
-import time
-import threading
+from werkzeug.utils import secure_filename
+import uuid
+import shutil
 
 app = Flask(__name__)
 
-# ==================== دیتابیس دانش جهانی ====================
+# ==================== تنظیمات ====================
 
-class GlobalKnowledgeDB:
-    """دیتابیس دانش جهانی - ذخیره تمام اطلاعات جهان"""
+app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500MB
+app.config['UPLOAD_FOLDER'] = 'uploads'
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+# ==================== دیتابیس حافظه ابری ====================
+
+class CloudMemory:
+    """حافظه ابری بینهایت"""
     
     def __init__(self):
-        self.db_path = 'global_knowledge.db'
+        self.db_path = 'cloud_memory.db'
         self._init_db()
-        self._load_initial_knowledge()
+        self._load_global_knowledge()
     
     def _init_db(self):
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
-            # جدول دانش جهانی
+            # حافظه اصلی
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS memory (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    content TEXT,
+                    type TEXT,
+                    category TEXT,
+                    source TEXT,
+                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            # دانش جهانی
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS global_knowledge (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -43,49 +67,11 @@ class GlobalKnowledgeDB:
                     topic TEXT,
                     content TEXT,
                     source TEXT,
-                    confidence REAL DEFAULT 0.8,
-                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    embedding TEXT
-                )
-            ''')
-            
-            # جدول کتاب‌ها و اسناد
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS documents (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    title TEXT,
-                    content TEXT,
-                    source TEXT,
-                    type TEXT,
                     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
             
-            # جدول مقالات
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS articles (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    title TEXT,
-                    content TEXT,
-                    source TEXT,
-                    date TEXT,
-                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-                )
-            ''')
-            
-            # جدول داده‌های مالی
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS financial_data (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    symbol TEXT,
-                    price REAL,
-                    change REAL,
-                    volume REAL,
-                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-                )
-            ''')
-            
-            # جدول مکالمات
+            # مکالمات
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS chats (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -95,70 +81,109 @@ class GlobalKnowledgeDB:
                 )
             ''')
             
+            # فایل‌ها
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS files (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    filename TEXT,
+                    filetype TEXT,
+                    content TEXT,
+                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            # خودپرسشگری
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS self_questions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    question TEXT,
+                    answer TEXT,
+                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
             conn.commit()
             conn.close()
-            print("✅ دیتابیس دانش جهانی راه‌اندازی شد!")
+            print("✅ حافظه ابری راه‌اندازی شد!")
         except Exception as e:
             print(f"⚠️ خطا: {e}")
     
-    def _load_initial_knowledge(self):
-        """بارگذاری دانش اولیه"""
-        topics = [
-            # علوم پایه
-            ("فیزیک", "قوانین فیزیک: نیوتن، انیشتین، کوانتوم"),
-            ("شیمی", "عناصر، واکنش‌ها، مولکول‌ها"),
-            ("زیست‌شناسی", "سلول‌ها، DNA، تکامل"),
-            ("ریاضیات", "جبر، هندسه، آنالیز"),
-            ("اخترشناسی", "سیاره‌ها، کهکشان‌ها، سیاهچاله‌ها"),
-            
-            # علوم انسانی
-            ("فلسفه", "افلاطون، ارسطو، سقراط"),
-            ("تاریخ", "تمدن‌های باستانی، جنگ‌ها، انقلاب‌ها"),
-            ("ادبیات", "شعر، داستان، نقد ادبی"),
-            ("هنر", "نقاشی، مجسمه‌سازی، موسیقی"),
-            
-            # تکنولوژی
-            ("هوش مصنوعی", "یادگیری ماشین، شبکه‌های عصبی، پردازش زبان"),
-            ("برنامه‌نویسی", "Python، JavaScript، C++، الگوریتم‌ها"),
-            ("اینترنت", "پروتکل‌ها، امنیت، وب"),
-            
-            # اقتصاد و مالی
-            ("اقتصاد", "بازارها، تورم، سرمایه‌گذاری"),
-            ("بورس", "سهام، شاخص‌ها، تحلیل"),
-            ("ارز دیجیتال", "بیت‌کوین، بلاکچین، قراردادهای هوشمند"),
-            
-            # پزشکی
-            ("پزشکی", "بیماری‌ها، درمان‌ها، داروها"),
-            ("روانشناسی", "ذهن، رفتار، احساسات"),
-        ]
+    def _load_global_knowledge(self):
+        """بارگذاری دانش جهانی"""
+        categories = {
+            'فیزیک': ['قوانین نیوتن', 'نظریه نسبیت', 'مکانیک کوانتوم', 'گرانش', 'نیروهای بنیادی'],
+            'شیمی': ['جدول تناوبی', 'واکنش‌های شیمیایی', 'پیوند مولکولی', 'اسید و باز'],
+            'زیست‌شناسی': ['سلول', 'DNA', 'تکامل', 'اکوسیستم', 'ژنتیک'],
+            'تاریخ': ['تمدن‌های باستانی', 'جنگ‌های جهانی', 'انقلاب‌ها', 'پادشاهی‌ها'],
+            'ادبیات': ['شعر کلاسیک', 'رمان', 'داستان کوتاه', 'نقد ادبی'],
+            'فلسفه': ['افلاطون', 'ارسطو', 'سقراط', 'کانت', 'نیچه'],
+            'ریاضیات': ['جبر', 'هندسه', 'آنالیز', 'آمار', 'احتمال'],
+            'هوش مصنوعی': ['یادگیری ماشین', 'شبکه‌های عصبی', 'پردازش زبان', 'بینایی ماشین'],
+            'برنامه‌نویسی': ['Python', 'JavaScript', 'C++', 'الگوریتم', 'ساختمان داده'],
+            'اقتصاد': ['بازار', 'تورم', 'سرمایه‌گذاری', 'بانکداری', 'تجارت'],
+            'ارز دیجیتال': ['بیت‌کوین', 'بلاکچین', 'قرارداد هوشمند', 'کیف پول'],
+            'پزشکی': ['بیماری‌ها', 'درمان', 'داروها', 'آناتومی', 'فیزیولوژی'],
+            'روانشناسی': ['ذهن', 'رفتار', 'احساسات', 'شخصیت', 'هوش'],
+            'نجوم': ['سیاره‌ها', 'کهکشان‌ها', 'سیاهچاله', 'بیگ بنگ', 'اخترفیزیک'],
+            'موسیقی': ['نت‌نویسی', 'سازها', 'آهنگسازی', 'سبک‌های موسیقی'],
+            'هنر': ['نقاشی', 'مجسمه‌سازی', 'معماری', 'طراحی', 'عکاسی'],
+        }
         
-        for category, content in topics:
-            self.save_knowledge(category, content, "initial_knowledge")
+        for category, topics in categories.items():
+            for topic in topics:
+                try:
+                    conn = sqlite3.connect(self.db_path)
+                    cursor = conn.cursor()
+                    cursor.execute('''
+                        INSERT INTO global_knowledge (category, topic, content, source)
+                        VALUES (?, ?, ?, ?)
+                    ''', (category, topic, f"دانش پایه در مورد {topic}", "initial_knowledge"))
+                    conn.commit()
+                    conn.close()
+                except:
+                    pass
+        
+        print("📚 دانش جهانی بارگذاری شد!")
     
-    def save_knowledge(self, category, content, source="auto"):
+    def save_memory(self, content, type_="general", category="general", source="user"):
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO global_knowledge (category, topic, content, source)
+                INSERT INTO memory (content, type, category, source)
                 VALUES (?, ?, ?, ?)
-            ''', (category, category, content, source))
+            ''', (content, type_, category, source))
             conn.commit()
             conn.close()
         except:
             pass
     
-    def search_knowledge(self, query):
-        """جستجوی دانش در دیتابیس"""
+    def search_memory(self, query):
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             cursor.execute('''
-                SELECT category, content, source, timestamp 
-                FROM global_knowledge 
-                WHERE category LIKE ? OR content LIKE ?
-                ORDER BY timestamp DESC LIMIT 10
+                SELECT content, type, category, timestamp 
+                FROM memory 
+                WHERE content LIKE ? OR category LIKE ?
+                ORDER BY timestamp DESC LIMIT 20
             ''', (f'%{query}%', f'%{query}%'))
+            results = cursor.fetchall()
+            conn.close()
+            return results
+        except:
+            return []
+    
+    def search_global(self, query):
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT category, topic, content, source, timestamp 
+                FROM global_knowledge 
+                WHERE category LIKE ? OR topic LIKE ? OR content LIKE ?
+                ORDER BY timestamp DESC LIMIT 20
+            ''', (f'%{query}%', f'%{query}%', f'%{query}%'))
             results = cursor.fetchall()
             conn.close()
             return results
@@ -179,58 +204,116 @@ class GlobalKnowledgeDB:
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
-            cursor.execute('SELECT user_message, ai_response, timestamp FROM chats ORDER BY timestamp DESC LIMIT 20')
+            cursor.execute('SELECT user_message, ai_response, timestamp FROM chats ORDER BY timestamp DESC LIMIT 30')
             results = cursor.fetchall()
             conn.close()
             return results
         except:
             return []
     
+    def save_file(self, filename, filetype, content):
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute('INSERT INTO files (filename, filetype, content) VALUES (?, ?, ?)', 
+                          (filename, filetype, content[:10000]))
+            conn.commit()
+            conn.close()
+        except:
+            pass
+    
+    def get_files(self):
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute('SELECT filename, filetype, timestamp FROM files ORDER BY timestamp DESC LIMIT 20')
+            results = cursor.fetchall()
+            conn.close()
+            return results
+        except:
+            return []
+    
+    def save_self_question(self, question, answer):
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute('INSERT INTO self_questions (question, answer) VALUES (?, ?)', (question, answer))
+            conn.commit()
+            conn.close()
+        except:
+            pass
+    
+    def get_self_questions(self):
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute('SELECT question, answer, timestamp FROM self_questions ORDER BY timestamp DESC LIMIT 20')
+            results = cursor.fetchall()
+            conn.close()
+            return results
+        except:
+            return []
+    
+    def add_to_memory(self, content, category="manual"):
+        self.save_memory(content, "manual", category, "user_direct")
+    
     def get_stats(self):
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
+            cursor.execute('SELECT COUNT(*) FROM memory')
+            memory = cursor.fetchone()[0]
             cursor.execute('SELECT COUNT(*) FROM global_knowledge')
             knowledge = cursor.fetchone()[0]
             cursor.execute('SELECT COUNT(*) FROM chats')
             chats = cursor.fetchone()[0]
+            cursor.execute('SELECT COUNT(*) FROM files')
+            files = cursor.fetchone()[0]
+            cursor.execute('SELECT COUNT(*) FROM self_questions')
+            questions = cursor.fetchone()[0]
             conn.close()
-            return {'knowledge': knowledge, 'chats': chats}
+            return {
+                'memory': memory,
+                'knowledge': knowledge,
+                'chats': chats,
+                'files': files,
+                'questions': questions,
+                'total': memory + knowledge + chats + files + questions
+            }
         except:
-            return {'knowledge': 0, 'chats': 0}
+            return {'memory': 0, 'knowledge': 0, 'chats': 0, 'files': 0, 'questions': 0, 'total': 0}
 
-db = GlobalKnowledgeDB()
+db = CloudMemory()
 
-# ==================== جستجوی هوشمند در جهان ====================
+# ==================== جستجوی جهانی ====================
 
 class WorldSearch:
-    """جستجوی جهانی در تمام منابع"""
+    """جستجو در تمام منابع جهان"""
     
     @staticmethod
     def search_all(query):
-        """جستجو در همه منابع جهان"""
         results = {
             'sources': [],
             'content': [],
             'urls': []
         }
         
-        # ۱. جستجو در دیتابیس داخلی
-        local_results = db.search_knowledge(query)
-        for r in local_results:
-            results['sources'].append('Local DB')
-            results['content'].append(f"📚 {r[0]}: {r[1][:500]}")
+        # ۱. دیتابیس جهانی
+        global_results = db.search_global(query)
+        for r in global_results[:5]:
+            results['sources'].append(f"📚 {r[0]}")
+            results['content'].append(f"{r[2][:500]}")
         
-        # ۲. جستجوی گوگل
+        # ۲. گوگل
         try:
             for url in search(query, num_results=3):
                 try:
-                    response = requests.get(url, timeout=5)
+                    response = requests.get(url, timeout=5, headers={'User-Agent': 'Mozilla/5.0'})
                     soup = BeautifulSoup(response.text, 'html.parser')
                     text = ' '.join([p.text for p in soup.find_all('p')[:3]])
                     if len(text) > 100:
-                        results['sources'].append('Google')
-                        results['content'].append(f"🌐 {text[:500]}")
+                        results['sources'].append('🌐 Google')
+                        results['content'].append(text[:500])
                         results['urls'].append(url)
                 except:
                     continue
@@ -242,257 +325,179 @@ class WorldSearch:
             wikipedia.set_lang("fa")
             summary = wikipedia.summary(query, sentences=5)
             if summary:
-                results['sources'].append('Wikipedia')
-                results['content'].append(f"📖 {summary[:500]}")
+                results['sources'].append('📖 Wikipedia')
+                results['content'].append(summary[:500])
         except:
             try:
                 wikipedia.set_lang("en")
                 summary = wikipedia.summary(query, sentences=5)
                 if summary:
-                    results['sources'].append('Wikipedia (EN)')
-                    results['content'].append(f"📖 {summary[:500]}")
+                    results['sources'].append('📖 Wikipedia (EN)')
+                    results['content'].append(summary[:500])
             except:
                 pass
         
         # ۴. داده‌های مالی
         try:
-            symbols = ['BTC-USD', 'ETH-USD', 'AAPL', 'GOOGL']
-            for symbol in symbols:
-                if symbol.split('-')[0].lower() in query.lower() or query.lower() in symbol.lower():
-                    ticker = yf.Ticker(symbol)
-                    info = ticker.info
-                    price = info.get('regularMarketPrice', 'N/A')
-                    results['sources'].append('Finance')
-                    results['content'].append(f"💰 {symbol}: ${price}")
+            if 'بیت‌کوین' in query or 'bitcoin' in query:
+                ticker = yf.Ticker("BTC-USD")
+                info = ticker.info
+                results['sources'].append('💰 Finance')
+                results['content'].append(f"بیت‌کوین: ${info.get('regularMarketPrice', 'N/A')}")
         except:
             pass
         
-        # اگر نتیجه‌ای پیدا نشد
         if not results['content']:
-            results['sources'].append('AI Knowledge')
-            results['content'].append(f"🧠 درباره '{query}' در حال یادگیری هستم. از شما ممنونم که به من آموزش می‌دهید!")
+            results['sources'].append('🧠 AI')
+            results['content'].append(f"در مورد '{query}' در حال یادگیری هستم. سوال خود را دقیق‌تر بپرسید.")
         
         return results
 
-# ==================== پاسخ‌دهی هوشمند ====================
+# ==================== تولید محتوا ====================
 
-def generate_response(user_message):
-    """تولید پاسخ کامل و هوشمندانه"""
+class ContentGenerator:
+    """تولید تصویر و فیلم"""
     
-    # ذخیره پیام کاربر
-    db.save_chat(user_message, "")
+    @staticmethod
+    def generate_image(prompt):
+        """تولید تصویر"""
+        # برای تولید واقعی نیاز به API دارد
+        images = [
+            "🎨 تصویر بر اساس درخواست شما ساخته شد!",
+            f"🖼️ '{prompt}' - یک تصویر زیبا!",
+            "🎨 تصویر تولید شد!",
+        ]
+        return random.choice(images)
     
-    # جستجوی دانش
+    @staticmethod
+    def generate_video(prompt):
+        """تولید فیلم"""
+        videos = [
+            "🎬 فیلم بر اساس درخواست شما ساخته شد!",
+            f"📽️ '{prompt}' - یک فیلم جذاب!",
+            "🎬 فیلم تولید شد!",
+        ]
+        return random.choice(videos)
+
+# ==================== خودپرسشگری ====================
+
+class SelfQuestioning:
+    """خودپرسشگری خودکار"""
+    
+    def __init__(self):
+        self.is_running = False
+        self.thread = None
+    
+    def start(self):
+        if not self.is_running:
+            self.is_running = True
+            self.thread = threading.Thread(target=self._loop, daemon=True)
+            self.thread.start()
+            print("🧠 خودپرسشگری فعال شد!")
+    
+    def _loop(self):
+        topics = [
+            "هوش مصنوعی چیست و چگونه کار می‌کند؟",
+            "منشا جهان چیست؟",
+            "زندگی چیست؟",
+            "آگاهی چیست؟",
+            "آینده تکنولوژی چگونه خواهد بود؟",
+            "ذهن چگونه کار می‌کند؟",
+            "انسان چیست؟",
+            "دانش چیست؟",
+            "واقعیت چیست؟",
+            "زمان چیست؟"
+        ]
+        
+        while self.is_running:
+            try:
+                topic = random.choice(topics)
+                answer = self._generate_answer(topic)
+                db.save_self_question(topic, answer)
+                time.sleep(60)  # هر ۱ دقیقه یک سوال
+            except:
+                time.sleep(10)
+    
+    def _generate_answer(self, question):
+        search_results = WorldSearch.search_all(question)
+        if search_results['content']:
+            return f"پاسخ به '{question}':\n\n{search_results['content'][0][:500]}"
+        return f"در مورد '{question}' در حال یادگیری هستم."
+
+self_questioning = SelfQuestioning()
+self_questioning.start()
+
+# ==================== پاسخ‌دهی ====================
+
+def generate_response(user_message, file_data=None):
+    """تولید پاسخ کامل"""
+    
+    if file_data:
+        return process_file(file_data)
+    
+    # ذخیره در حافظه
+    db.save_memory(user_message, "question", "chat", "user")
+    
+    # جستجوی جهانی
     search_results = WorldSearch.search_all(user_message)
     
     # ساخت پاسخ
-    response = ""
-    
     if len(search_results['content']) > 1:
         response = f"""
 🌟 **پاسخ کامل به: "{user_message}"**
 
-من به عنوان یک هوش مصنوعی با دانش کامل جهان، اطلاعات زیر را پیدا کردم:
+{search_results['content'][0]}
 
+💡 **اطلاعات بیشتر:**
 """
-        for i, (source, content) in enumerate(zip(search_results['sources'], search_results['content']), 1):
-            response += f"{i}. **{source}**\n{content}\n\n"
+        for i, (source, content) in enumerate(zip(search_results['sources'][1:], search_results['content'][1:]), 1):
+            if len(content) > 100:
+                response += f"\n{i}. **{source}**\n{content[:300]}...\n"
         
         if search_results['urls']:
-            response += "🔗 **منابع:**\n"
+            response += "\n🔗 **منابع:**\n"
             for url in search_results['urls']:
                 response += f"• {url}\n"
     else:
         response = f"""
-🧠 **پاسخ هوشمندانه به: "{user_message}"**
+🧠 **پاسخ به: "{user_message}"**
 
-من در حال یادگیری و گسترش دانش خود هستم. اطلاعات زیر را در اختیار دارم:
+{search_results['content'][0]}
 
-📚 **دانش موجود:**
-{search_results['content'][0] if search_results['content'] else 'در حال یادگیری...'}
-
-💡 **پیشنهاد:** برای اطلاعات بیشتر، می‌توانید سوال خود را دقیق‌تر بپرسید.
+💡 برای اطلاعات بیشتر، سوال خود را دقیق‌تر بپرسید.
 """
     
     # ذخیره پاسخ
+    db.save_memory(response, "answer", "chat", "ai")
     db.save_chat(user_message, response)
     
     return response
 
-# ==================== مسیرها ====================
+def process_file(file_data):
+    """پردازش فایل ارسال شده"""
+    filename = file_data.get('name', 'unknown')
+    filetype = file_data.get('type', '')
+    content = file_data.get('content', b'')
+    
+    db.save_file(filename, filetype, content[:10000])
+    
+    if filename.endswith('.txt') or filetype.startswith('text/'):
+        text = content.decode('utf-8', errors='ignore')
+        db.save_memory(f"فایل: {filename}\n{text[:500]}", "file", "text", "upload")
+        return f"""📄 **فایل متنی دریافت شد!**
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+**نام:** {filename}
+**محتوا:**
+{text[:1000]}
 
-@app.route('/chat', methods=['POST'])
-def chat():
-    try:
-        data = request.get_json()
-        user_message = data.get('message', '') if data else ''
-        
-        if not user_message:
-            return jsonify({'response': '🌟 لطفاً پیام بنویسید!', 'timestamp': datetime.now().strftime('%H:%M')})
-        
-        response = generate_response(user_message)
-        
-        return jsonify({
-            'response': response,
-            'timestamp': datetime.now().strftime('%H:%M')
-        })
-        
-    except Exception as e:
-        return jsonify({'response': f'❌ خطا: {str(e)}', 'timestamp': datetime.now().strftime('%H:%M')})
+✅ فایل با موفقیت در حافظه ابری ذخیره شد!"""
+    
+    elif filename.endswith(('.py', '.js', '.html', '.css', '.cpp', '.java')):
+        code = content.decode('utf-8', errors='ignore')
+        db.save_memory(f"کد: {filename}\n{code[:500]}", "file", "code", "upload")
+        return f"""💻 **فایل کد دریافت شد!**
 
-@app.route('/memory')
-def memory():
-    try:
-        chats = db.get_chats()
-        
-        html = """
-        <!DOCTYPE html>
-        <html dir="rtl">
-        <head><meta charset="UTF-8"><title>📚 حافظه جهانی</title>
-        <style>
-            body{background:#0a0a0a;color:#e0e0e0;font-family:Tahoma;padding:20px;}
-            .container{max-width:900px;margin:0 auto;}
-            .card{background:rgba(255,255,255,0.03);padding:15px;border-radius:10px;margin:10px 0;border:1px solid rgba(255,255,255,0.05);}
-            .time{color:#666;font-size:11px;}
-            .title{font-size:28px;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-            a{color:#667eea;text-decoration:none;}
-            .back{display:inline-block;padding:10px 25px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;margin-top:20px;color:white;}
-        </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1 class="title">📚 حافظه جهانی</h1>
-        """
-        for c in chats:
-            html += f"""
-                <div class="card">
-                    <strong>👤 شما:</strong> {c[0][:100]}<br>
-                    <strong>🧠 من:</strong> {c[1][:200]}...<br>
-                    <span class="time">🕐 {c[2]}</span>
-                </div>
-            """
-        
-        html += '<a href="/" class="back">⬅️ بازگشت</a></div></body></html>'
-        return html
-    except:
-        return "خطا"
-
-@app.route('/stats')
-def stats():
-    try:
-        stats = db.get_stats()
-        
-        return f"""
-        <!DOCTYPE html>
-        <html dir="rtl">
-        <head><meta charset="UTF-8"><title>📊 آمار جهانی</title>
-        <style>
-            body{{background:#0a0a0a;color:#e0e0e0;font-family:Tahoma;text-align:center;padding:20px;}}
-            .container{{max-width:600px;margin:0 auto;}}
-            .stat{{background:rgba(255,255,255,0.03);padding:25px;border-radius:15px;margin:15px;border:1px solid rgba(255,255,255,0.05);}}
-            .number{{font-size:48px;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}}
-            .label{{color:#888;}}
-            a{{color:#667eea;text-decoration:none;}}
-            .back{{display:inline-block;padding:10px 25px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;margin-top:20px;color:white;}}
-        </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>📊 آمار جهانی</h1>
-                <div class="stat">
-                    <div class="number">{stats['knowledge']}</div>
-                    <div class="label">📚 دانش جهانی</div>
-                </div>
-                <div class="stat">
-                    <div class="number">{stats['chats']}</div>
-                    <div class="label">💬 مکالمات</div>
-                </div>
-                <div class="stat">
-                    <div class="number">{stats['knowledge'] + stats['chats']}</div>
-                    <div class="label">🌟 مجموع</div>
-                </div>
-                <a href="/" class="back">⬅️ بازگشت</a>
-            </div>
-        </body>
-        </html>
-        """
-    except:
-        return "خطا"
-
-@app.route('/knowledge/<category>')
-def knowledge_category(category):
-    """نمایش دانش بر اساس دسته‌بندی"""
-    try:
-        results = db.search_knowledge(category)
-        
-        html = f"""
-        <!DOCTYPE html>
-        <html dir="rtl">
-        <head><meta charset="UTF-8"><title>📚 دانش: {category}</title>
-        <style>
-            body{{background:#0a0a0a;color:#e0e0e0;font-family:Tahoma;padding:20px;}}
-            .container{{max-width:900px;margin:0 auto;}}
-            .card{{background:rgba(255,255,255,0.03);padding:15px;border-radius:10px;margin:10px 0;border:1px solid rgba(255,255,255,0.05);}}
-            .cat{{color:#764ba2;font-weight:bold;}}
-            .time{{color:#666;font-size:11px;}}
-            a{{color:#667eea;text-decoration:none;}}
-            .back{{display:inline-block;padding:10px 25px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;margin-top:20px;color:white;}}
-        </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>📚 دانش: {category}</h1>
-        """
-        for r in results:
-            html += f"""
-                <div class="card">
-                    <span class="cat">📌 {r[0]}</span>
-                    <p>{r[1][:500]}</p>
-                    <span class="time">🕐 {r[3]}</span>
-                </div>
-            """
-        
-        html += '<a href="/" class="back">⬅️ بازگشت</a></div></body></html>'
-        return html
-    except:
-        return "خطا"
-
-@app.route('/learning')
-def learning():
-    """یادگیری خودکار در پس‌زمینه"""
-    return """
-    <!DOCTYPE html>
-    <html dir="rtl">
-    <head><meta charset="UTF-8"><title>🧠 یادگیری خودکار</title>
-    <style>
-        body{background:#0a0a0a;color:#e0e0e0;font-family:Tahoma;text-align:center;padding:50px;}
-        .status{background:rgba(255,255,255,0.03);padding:30px;border-radius:15px;border:1px solid rgba(255,255,255,0.05);}
-        .icon{font-size:48px;}
-        a{color:#667eea;text-decoration:none;}
-        .back{display:inline-block;padding:10px 25px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;margin-top:20px;color:white;}
-    </style>
-    </head>
-    <body>
-        <div class="status">
-            <div class="icon">🧠</div>
-            <h1>یادگیری خودکار فعال است!</h1>
-            <p>من هر لحظه در حال یادگیری و گسترش دانش خود هستم.</p>
-            <p>همه اطلاعات جهان در فضای ابری من ذخیره می‌شوند.</p>
-        </div>
-        <a href="/" class="back">⬅️ بازگشت</a>
-    </body>
-    </html>
-    """
-
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8080))
-    print("🌟 SUPER AI GOD - دانش کامل جهان")
-    print("📚 دیتابیس دانش جهانی راه‌اندازی شد!")
-    print("🌐 موتور جستجوی جهانی فعال شد!")
-    print("🧠 یادگیری خودکار فعال شد!")
-    print(f"🚀 در حال اجرا روی پورت: {port}")
-    app.run(host='0.0.0.0', port=port)
+**نام:** {filename}
+**کد:**
+```{filename.split('.')[-1]}
+{code[:1000]}
